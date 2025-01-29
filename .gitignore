@@ -1,0 +1,7 @@
+// what should i ignore in the project
+.env
+node_modules
+
+
+
+
