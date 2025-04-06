@@ -1,5 +1,5 @@
 // Import the query function from the db.config.js file 
-const conn = require("../config/db.config");
+const conn = require("../config/dbConfig");
 // Import the bcrypt module 
 const bcrypt = require('bcrypt');
 // A function to check if employee exists in the database 
