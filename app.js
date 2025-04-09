@@ -1,6 +1,6 @@
 // Import necessary modules 
 const express = require('express');
-const db = require('./config/dbConfig');
+// const db = require('./config/dbConfig');
 require('dotenv').config();
 const sanitize = require('sanitize');
 const cors = require('cors');
