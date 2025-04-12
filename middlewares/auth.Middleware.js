@@ -17,7 +17,13 @@ const verifyToken = async (req, res, next) => {
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    console.log("jwt ----" , process.env.JWT_SECRET);
+    console.log("Decoded ----" , decoded);
+    
+    
     if (err) {
+      console.log(err.message);
+      
       return res.status(401).send({
         status: "fail",
         message: "Unauthorized!"
