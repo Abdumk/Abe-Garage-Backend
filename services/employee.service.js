@@ -59,15 +59,71 @@ async function getAllEmployees() {
   const rows = await conn.query(query);
   return rows;
 }
-// Export the functions for use in the controller
+
+
+// Delete an employee by ID
+async function deleteEmployee(employee_id) {
+  try {
+    // Delete from dependent tables first (foreign key constraints)
+    await conn.query("DELETE FROM employee_pass WHERE employee_id = ?", [employee_id]);
+    await conn.query("DELETE FROM employee_info WHERE employee_id = ?", [employee_id]);
+    await conn.query("DELETE FROM employee_role WHERE employee_id = ?", [employee_id]);
+    const result = await conn.query("DELETE FROM employee WHERE employee_id = ?", [employee_id]);
+
+    return result.affectedRows > 0;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+// Update employee by ID
+async function updateEmployee(employee_id, employee) {
+  try {
+    // Update main employee table
+    await conn.query(
+      "UPDATE employee SET employee_email = ?, active_employee = ? WHERE employee_id = ?",
+      [employee.employee_email, employee.active_employee, employee_id]
+    );
+
+    // Update employee_info table
+    await conn.query(
+      "UPDATE employee_info SET employee_first_name = ?, employee_last_name = ?, employee_phone = ? WHERE employee_id = ?",
+      [employee.employee_first_name, employee.employee_last_name, employee.employee_phone, employee_id]
+    );
+
+    // Update employee_role table
+    await conn.query(
+      "UPDATE employee_role SET company_role_id = ? WHERE employee_id = ?",
+      [employee.company_role_id, employee_id]
+    );
+
+    // Optional: update password if provided
+    if (employee.employee_password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(employee.employee_password, salt);
+      await conn.query(
+        "UPDATE employee_pass SET employee_password_hashed = ? WHERE employee_id = ?",
+        [hashedPassword, employee_id]
+      );
+    }
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+// Export all functions
 module.exports = {
   checkIfEmployeeExists,
   createEmployee,
   getEmployeeByEmail,
-  getAllEmployees
+  getAllEmployees,
+  deleteEmployee,
+  updateEmployee
 };
-
-
 
 
 // // Import the query function from the db.config.js file 
@@ -119,17 +175,27 @@ module.exports = {
 //   // Return the employee object 
 //   return createdEmployee;
 // }
-
 // // A function to get employee by email
 // async function getEmployeeByEmail(employee_email) {
 //   const query = "SELECT * FROM employee INNER JOIN employee_info ON employee.employee_id = employee_info.employee_id INNER JOIN employee_pass ON employee.employee_id = employee_pass.employee_id INNER JOIN employee_role ON employee.employee_id = employee_role.employee_id WHERE employee.employee_email = ?";
 //   const rows = await conn.query(query, [employee_email]);
 //   return rows;
 // }
+// // A function to get all employees
+// async function getAllEmployees() {
+//   const query = "SELECT * FROM employee INNER JOIN employee_info ON employee.employee_id = employee_info.employee_id INNER JOIN employee_role ON employee.employee_id = employee_role.employee_id INNER JOIN company_roles ON employee_role.company_role_id = company_roles.company_role_id ORDER BY employee.employee_id DESC limit 10";
+//   const rows = await conn.query(query);
+//   return rows;
+// }
+
 
 // // Export the functions for use in the controller
 // module.exports = {
 //   checkIfEmployeeExists,
 //   createEmployee,
-//   getEmployeeByEmail
+//   getEmployeeByEmail,
+//   getAllEmployees
 // };
+
+
+
