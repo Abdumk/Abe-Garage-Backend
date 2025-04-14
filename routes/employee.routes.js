@@ -22,7 +22,20 @@ router.delete(
     "/api/employee/:id",
     [authMiddleware.verifyToken, authMiddleware.isAdmin],
     employeeController.updateEmployee
-  );// Export the router
+  );
+
+
+
+// GET - Fetch specific employee by ID
+router.get(
+    "/api/employee/:id",
+    [authMiddleware.verifyToken, authMiddleware.isAdmin],
+    employeeController.getEmployeeById
+  );
+
+
+
+// Export the router
 module.exports = router;
 
 

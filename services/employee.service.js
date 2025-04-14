@@ -79,6 +79,9 @@ async function deleteEmployee(employee_id) {
 
 // Update employee by ID
 async function updateEmployee(employee_id, employee) {
+  console.log("employee_id", employee_id);
+  console.log("employee", employee);
+  
   try {
     // Update main employee table
     await conn.query(
@@ -114,6 +117,30 @@ async function updateEmployee(employee_id, employee) {
     return false;
   }
 }
+// Get employee by ID
+async function getEmployeeById(employee_id) {
+  const query = `
+    SELECT 
+      employee.employee_id,
+      employee.employee_email,
+      employee.active_employee,
+      employee_info.employee_first_name,
+      employee_info.employee_last_name,
+      employee_info.employee_phone,
+      employee_role.company_role_id,
+      company_roles.company_role_name
+    FROM employee
+    INNER JOIN employee_info ON employee.employee_id = employee_info.employee_id
+    INNER JOIN employee_role ON employee.employee_id = employee_role.employee_id
+    INNER JOIN company_roles ON employee_role.company_role_id = company_roles.company_role_id
+    WHERE employee.employee_id = ?
+  `;
+
+  const rows = await conn.query(query, [employee_id]);
+  return rows.length > 0 ? rows[0] : null;
+}
+
+
 
 // Export all functions
 module.exports = {
@@ -122,7 +149,8 @@ module.exports = {
   getEmployeeByEmail,
   getAllEmployees,
   deleteEmployee,
-  updateEmployee
+  updateEmployee,
+  getEmployeeById
 };
 
 

@@ -75,12 +75,32 @@ async function updateEmployee(req, res) {
     res.status(500).json({ error: "Failed to update employee." });
   }
 }
+// Get employee by ID
+async function getEmployeeById(req, res) {
+  const id = req.params.id;
+
+  try {
+    const employee = await employeeService.getEmployeeById(id);
+
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found." });
+    }
+
+    res.status(200).json({ status: "success", data: employee });
+  } catch (error) {
+    console.error("Error getting employee by ID:", error);
+    res.status(500).json({ error: "Failed to get employee." });
+  }
+}
+
+
 
 // Export all controllers
 module.exports = {
   createEmployee,
   getAllEmployees,
   deleteEmployee,
+  getEmployeeById,
   updateEmployee
 };
 
