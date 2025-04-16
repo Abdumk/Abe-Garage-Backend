@@ -73,7 +73,7 @@ async function getAllCustomers() {
     FROM customer_identifier
     JOIN customer_info USING (customer_id)
     ORDER BY customer_id DESC
-    LIMIT 10
+     LIMIT 10
   `;
   const rows = await conn.query(query);
   return rows;
