@@ -18,4 +18,8 @@ router.put("/api/customer/:id", [authMiddleware.verifyToken, authMiddleware.isAd
 // GET - Fetch specific customer by ID
 router.get("/api/customer/:id", [authMiddleware.verifyToken, authMiddleware.isAdmin], customerController.getCustomerById);
 
+// get vehicles by customer ID
+router.get("/api/vehicles/:customerId", [authMiddleware.verifyToken, authMiddleware.isAdmin], customerController.getVehiclesByCustomerId);
+
+
 module.exports = router;

@@ -41,10 +41,6 @@ async function createCustomer(customer) {
       customer.active_customer_status
     ]);
 
-   
-
-   
-
     return { customer_id };
   } catch (err) {
     console.error(err);
@@ -107,21 +103,7 @@ async function updateCustomer(customer_id, customer) {
       "UPDATE customer_info SET customer_first_name = ?, customer_last_name = ?, active_customer_status = ? WHERE customer_id = ?",
       [customer.customer_first_name, customer.customer_last_name, customer.active_customer, customer_id]
     );
-
-    // await conn.query(
-    //   "UPDATE customer_role SET company_role_id = ? WHERE customer_id = ?",
-    //   [customer.company_role_id, customer_id]
-    // );
-
-    // if (customer.customer_password) {
-    //   const salt = await bcrypt.genSalt(10);
-    //   const hashedPassword = await bcrypt.hash(customer.customer_password, salt);
-    //   await conn.query(
-    //     "UPDATE customer_pass SET customer_password_hashed = ? WHERE customer_id = ?",
-    //     [hashedPassword, customer_id]
-    //   );
     
-
     return true;
   } catch (err) {
     console.error(err);
@@ -148,6 +130,17 @@ async function getCustomerById(customer_id) {
   return rows;
 }
 
+// Get vehicles by customer ID
+async function getVehiclesByCustomerId(customerId) {
+  const query = `
+    SELECT * FROM customer_vehicle_info 
+    WHERE customer_id = ?
+    ORDER BY vehicle_id DESC
+  `;
+  const rows = await conn.query(query, [customerId]);
+  return rows;
+}
+
 // Export all
 module.exports = {
   checkIfCustomerExists,
@@ -156,5 +149,6 @@ module.exports = {
   getAllCustomers,
   deleteCustomer,
   updateCustomer,
-  getCustomerById
+  getCustomerById,
+  getVehiclesByCustomerId
 };

@@ -92,11 +92,29 @@ async function getCustomerById(req, res) {
     res.status(500).json({ error: "Failed to get customer." });
   }
 }
+// Get vehicles by customer ID
+async function getVehiclesByCustomerId(req, res) {
+  const customerId = req.params.customerId;
+  
+  try {
+    const vehicles = await customerService.getVehiclesByCustomerId(customerId);
+    
+    if (!vehicles) {
+      return res.status(404).json({ error: "No vehicles found for this customer" });
+    }
+    
+    res.status(200).json(vehicles);
+  } catch (error) {
+    console.error("Error getting vehicles:", error);
+    res.status(500).json({ error: "Failed to get vehicles" });
+  }
+}
 
 module.exports = {
   createCustomer,
   getAllCustomers,
   deleteCustomer,
   getCustomerById,
-  updateCustomer
+  updateCustomer,
+  getVehiclesByCustomerId
 };

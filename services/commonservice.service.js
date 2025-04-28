@@ -67,21 +67,6 @@ async function updateService(id, service) {
       [service.service_name, service.service_description, id]
     );
 
-    
-    
-
-    // await conn.query(
-    //   "UPDATE customer_role SET company_role_id = ? WHERE customer_id = ?",
-    //   [customer.company_role_id, customer_id]
-    // );
-
-    // if (customer.customer_password) {
-    //   const salt = await bcrypt.genSalt(10);
-    //   const hashedPassword = await bcrypt.hash(customer.customer_password, salt);
-    //   await conn.query(
-    //     "UPDATE customer_pass SET customer_password_hashed = ? WHERE customer_id = ?",
-    //     [hashedPassword, customer_id]
-    //   );
 
     return true;
   } catch (err) {
