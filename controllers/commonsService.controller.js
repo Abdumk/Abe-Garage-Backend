@@ -1,6 +1,6 @@
 const Service = require('../services/commonservice.service');
 
-// Create customer controller
+// Create customer controller file
 async function createService(req, res, next) {
  
 
