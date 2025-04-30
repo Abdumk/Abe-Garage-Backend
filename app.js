@@ -38,6 +38,10 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// ✅ Insert this test route here
+app.get('/', (req, res) => {
+  res.send('Backend is working!');
+});
 // Start the webserver
 app.listen(port, () => {
   console.log(`Server running on port: ${port}`);
