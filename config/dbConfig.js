@@ -1,64 +1,121 @@
-// Import mysql2 module promise wrapper
-const mysql2 = require('mysql2/promise');
+// config/dbConfig.js
+const mysql = require('mysql2/promise'); // Note: Consistent module name
 
-// Import dotenv module and call the config method to load environment variables
-require('dotenv').config();
-
-// Prepare connection parameters we use to connect to the database
 const dbConfig = {
-  host: process.env.DB_HOST,   // e.g., 'localhost'
-  user: process.env.DB_USER,   // e.g., 'root'
-  password: process.env.DB_PASSWORD,  // e.g., 'root'
-  database: process.env.DB_NAME,  // e.g., 'my_database'
-  port: process.env.DB_PORT || 3306, // Default to 3306 if not set
+  host: process.env.DB_HOST || 'bqxlqmpnqrcepj9or4sg-mysql.services.clever-cloud.com',
+  user: process.env.DB_USER || 'uqrr3daaini4a2pr',
+  password: process.env.DB_PASSWORD || 'pTqg5dnSK4nldo0cNxek',
+  database: process.env.DB_NAME || 'bqxlqmpnqrcepj9or4sg',
+  port: process.env.DB_PORT || 3306,
+  ssl: { rejectUnauthorized: false }, // Required for Clever Cloud
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 10, // Recommended for most apps
   queueLimit: 0
 };
 
-// Create a connection pool to the database
-const pool = mysql2.createPool(dbConfig);
+// Create connection pool (using 'mysql', not 'mysql2' since we imported it as 'mysql')
+const pool = mysql.createPool(dbConfig);
 
-// Function to execute SQL queries asynchronously
-async function query(sql, params) {
-  const [rows, fields] = await pool.execute(sql, params);
-  return rows;
-}
-
-// Test connection with a simple query
-async function testConnection() {
+// Test connection immediately
+(async () => {
   try {
-    const rows = await query('SELECT 1 + 1 AS result');
-    console.log('Test query result:', rows[0].result);  // Should output 2
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT 1 + 1 AS result');
+    connection.release();
+    console.log('✅ Database connection test successful. Result:', rows[0].result);
   } catch (err) {
-    console.error('Error with test query:', err);
+    console.error('❌ Database connection failed:', err.message);
+    process.exit(1); // Exit if DB connection fails
+  }
+})();
+
+// Universal query function
+async function query(sql, params) {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    const [rows] = await connection.query(sql, params);
+    return rows;
+  } finally {
+    if (connection) connection.release();
   }
 }
 
-// Call the test function to verify connection
-testConnection();
-
-// Handle connection errors
-pool.getConnection((err, connection) => {
-  if (err) {
-    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-      console.error('Database connection was closed.');
-    }
-    if (err.code === 'ER_CON_COUNT_ERROR') {
-      console.error('Database has too many connections.');
-    }
-    if (err.code === 'ECONNREFUSED') {
-      console.error('Database connection was refused.');
-    }
-  }
-
-  if (connection) connection.release();
-
-  return;
+// Enhanced error handling
+pool.on('connection', (connection) => {
+  console.log('New database connection established');
 });
 
-// Export query function to be used in other files
-module.exports = { query };
+pool.on('error', (err) => {
+  console.error('Database pool error:', err.message);
+});
+
+module.exports = {
+  query,
+  pool // Export pool for transactions
+};
+
+// // Import mysql2 module promise wrapper
+// const mysql2 = require('mysql2/promise');
+
+// // Import dotenv module and call the config method to load environment variables
+// require('dotenv').config();
+
+// // Prepare connection parameters we use to connect to the database
+// const dbConfig = {
+//   host: process.env.DB_HOST,   // e.g., 'localhost'
+//   user: process.env.DB_USER,   // e.g., 'root'
+//   password: process.env.DB_PASSWORD,  // e.g., 'root'
+//   database: process.env.DB_NAME,  // e.g., 'my_database'
+//   port: process.env.DB_PORT || 3306, // Default to 3306 if not set
+//   waitForConnections: true,
+//   connectionLimit: 10,
+//   queueLimit: 0
+// };
+
+// // Create a connection pool to the database
+// const pool = mysql2.createPool(dbConfig);
+
+// // Function to execute SQL queries asynchronously
+// async function query(sql, params) {
+//   const [rows, fields] = await pool.execute(sql, params);
+//   return rows;
+// }
+
+// // Test connection with a simple query
+// async function testConnection() {
+//   try {
+//     const rows = await query('SELECT 1 + 1 AS result');
+//     console.log('Test query result:', rows[0].result);  // Should output 2
+//   } catch (err) {
+//     console.error('Error with test query:', err);
+//   }
+// }
+
+// // Call the test function to verify connection
+// testConnection();
+
+// // Handle connection errors
+// pool.getConnection((err, connection) => {
+//   if (err) {
+//     if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+//       console.error('Database connection was closed.');
+//     }
+//     if (err.code === 'ER_CON_COUNT_ERROR') {
+//       console.error('Database has too many connections.');
+//     }
+//     if (err.code === 'ECONNREFUSED') {
+//       console.error('Database connection was refused.');
+//     }
+//   }
+
+//   if (connection) connection.release();
+
+//   return;
+// });
+
+// // Export query function to be used in other files
+// module.exports = { query };
 
 
 

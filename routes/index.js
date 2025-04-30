@@ -16,7 +16,8 @@ const commonServiceRouter = require('./commonsService.routes');
 const vehicleRouter = require('./vehicle.routes');
 // import the service router
 const serviceRouter = require('./service.routes');
-
+// import the orders Router
+const orderRouter = require('./order.routes');
 // Add the install router to the main router 
 router.use(installRouter);
 // Add the employee routes to the main router 
@@ -31,5 +32,9 @@ router.use(commonServiceRouter);
 router.use(vehicleRouter);
 // Add the service routes to the main router
 router.use(serviceRouter);
+
+
+// And add this with your other router.use() calls
+router.use(orderRouter);
 // Export the router
 module.exports = router; 
