@@ -13,7 +13,8 @@ const sanitize = require('sanitize');
 const cors = require('cors');
 // Set up the CORS options to allow requests from our front-end 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: 'https://abdumk.github.io', // 👈 allow GitHub Pages root
+  credentials: true,
   optionsSuccessStatus: 200
 };
 // Create a variable to hold our port number 
